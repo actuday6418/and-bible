@@ -38,10 +38,10 @@ val npmUpgrade by tasks.registering(Exec::class) {
     workingDir = file(jsDir)
     // Workaround for F-droid, which has buggy npm version 5.8, that always fails when installing packages.
     if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
-        commandLine("npx.cmd", "npm@latest", "install", "--save-dev", "npm@latest")
+        commandLine("npx.cmd", "npm@latest", "ci", "--save-dev", "npm@latest")
     }
     else {
-        commandLine("npx", "npm@latest", "install", "--save-dev", "npm@latest")
+        commandLine("npx", "npm@latest", "ci", "--save-dev", "npm@latest")
     }
 }
 
@@ -52,10 +52,10 @@ val npmInstall by tasks.registering(Exec::class) {
 
     workingDir = file(jsDir)
     if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
-        commandLine("$rootDir/app/$jsDir/node_modules/.bin/npm.cmd", "install")
+        commandLine("$rootDir/app/$jsDir/node_modules/.bin/npm.cmd", "ci")
     }
     else {
-        commandLine("node_modules/.bin/npm", "install")
+        commandLine("node_modules/.bin/npm", "ci")
     }
 }
 
@@ -142,6 +142,30 @@ android {
 //			zipAlignEnabled true
         }
     }
+
+    val dimAppearance = "appearance"
+
+    flavorDimensions(dimAppearance)
+
+    productFlavors {
+        create("standard") {
+            dimension = dimAppearance
+            isDefault = true
+        }
+
+        create("discrete") {
+            dimension = dimAppearance
+        }
+
+        create("fdroid") {
+            dimension = dimAppearance
+        }
+
+        create("github") {
+            dimension = dimAppearance
+        }
+    }
+
 
     lint {
         disable("MissingTranslation")
@@ -248,7 +272,7 @@ dependencies {
 
     implementation("de.greenrobot:eventbus:2.4.1")
 
-    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0") // make sure this is the same version that commons-text depends on
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
 
     implementation("com.github.AndBible:jsword:$jswordVersion")

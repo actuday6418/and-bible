@@ -185,7 +185,9 @@ open class Window (
                 PassageChangeMediator.getInstance().contentChangeStarted()
             }
 
+            bibleView?.adjustLoadingCount(1)
             val doc = fetchDocument()
+            bibleView?.adjustLoadingCount(-1)
             val checksum = if(pageManager.isCommentaryShown && doc is OsisDocument) {
                 val checksum = doc.osisFragment.xmlStr.hashCode()
                 if (lastChecksum == checksum && bibleView?.firstDocument != null) {
