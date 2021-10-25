@@ -36,7 +36,9 @@
   </InputText>
   <div @click.stop class="edit-area pell">
     <div ref="editorElement"/>
-    <div class="saved-notice" v-if="!dirty"><FontAwesomeIcon icon="save"/></div>
+    <div class="saved-notice" v-if="!dirty">
+      <FontAwesomeIcon icon="save"/>
+    </div>
   </div>
 </template>
 
@@ -270,12 +272,12 @@ export default {
   right: 5px;
   bottom: $pell-button-height;
   padding-inline-end: 3pt;
-  color: hsla(113, 100%, 33%, 0.5);
+  color: hsla(112, 100%, 33%, 0.8);
   .night & {
-    color: hsla(113, 100%, 33%, 0.5);
+    color: hsla(112, 100%, 33%, 0.5);
   }
   opacity: 0.8;
-  font-size: 16px;
+  font-size: 10px;
   z-index:0;
 }
 

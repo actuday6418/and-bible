@@ -14,6 +14,17 @@ plugins {
 
 val jsDir = "bibleview-js"
 
+// The flavor dimension for the appearance of the app
+val dimAppearance = "appearance"
+val discreteFlavor = "discrete"
+// This is the "standard" applicationId.
+// This value must remain the same as it has been since the original
+// release in 2010 for continuity of updates for existing users.
+val applicationIdStandard = "net.bible.android.activity"
+// An alternative applicationId, to be used for the "discrete" flavor.
+val applicationIdDiscrete = "com.example.ToDo"
+
+
 fun getGitHash(): String =
     ByteArrayOutputStream().use { stdout ->
         exec {
@@ -108,7 +119,7 @@ android {
 
     /** these config values override those in AndroidManifest.xml.  Can also set versionCode and versionName */
     defaultConfig {
-        applicationId = "net.bible.android.activity"
+        applicationId = applicationIdStandard
         minSdk =21
         targetSdk = 30
         vectorDrawables.useSupportLibrary = true
@@ -143,8 +154,6 @@ android {
         }
     }
 
-    val dimAppearance = "appearance"
-
     flavorDimensions(dimAppearance)
 
     productFlavors {
@@ -153,7 +162,7 @@ android {
             isDefault = true
         }
 
-        create("discrete") {
+        create(discreteFlavor) {
             dimension = dimAppearance
         }
 
@@ -221,6 +230,20 @@ android {
 
 }
 
+androidComponents {
+    val discreteSelector = selector().withFlavor(dimAppearance to discreteFlavor )
+    // Set the applicationId to a more discrete alternative.
+    // Replace only the "standard" prefix, in order to preserve any
+    // suffixes that are contributed by the build types or product flavors.
+    onVariants(discreteSelector) { variant ->
+        val originalAppId = variant.applicationId.get()
+        val alternateAppId = originalAppId.replace(applicationIdStandard, applicationIdDiscrete)
+        variant.applicationId.set(alternateAppId)
+        logger.info("Reconfigured variant ${variant.name} with applicationId '${alternateAppId}' (was ${originalAppId})")
+    }
+}
+
+
 dependencies {
     val commonsTextVersion: String by rootProject.extra
     val jdomVersion: String by rootProject.extra
@@ -237,7 +260,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.3.1")
 
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.media:media:1.4.2")
+    implementation("androidx.media:media:1.4.3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.1")
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.preference:preference:1.1.1")
