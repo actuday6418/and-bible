@@ -84,7 +84,8 @@ import AmbiguousActionButtons from "@/components/AmbiguousActionButtons";
 export default {
   name: "AmbiguousSelection",
   props: {
-    blocking: {type: Boolean, default: false}
+    blocking: {type: Boolean, default: false},
+    doNotCloseModals: {type: Boolean, default: false},
   },
   emits: ["back-clicked"],
   components: {Modal, FontAwesomeIcon, AmbiguousSelectionBookmarkButton, AmbiguousActionButtons},
@@ -170,11 +171,14 @@ export default {
       for(let o of ordinalRange()) {
         highlightVerse(o);
       }
-      if (endOrdinal.value == null || endOrdinal.value == startOrdinal.value){
+      if (endOrdinal.value == null || endOrdinal.value === startOrdinal.value){
         verseInfo.value.verseTo = "";
       } else {
-        //TODO: Check if selection goes into next chapter and display accordingly.
-        verseInfo.value.verseTo = verseInfo.value.verse + endOrdinal.value - startOrdinal.value;
+        const {ordinalRange: [, chapterEnd]} = verseInfo.value.bibleDocumentInfo;
+
+        const endOrd = chapterEnd > endOrdinal.value ? endOrdinal.value: chapterEnd;
+        console.log({verseInfo: verseInfo.value, endOrd, endOrdinal, chapterEnd});
+        verseInfo.value.verseTo = `${verseInfo.value.verse + endOrd - startOrdinal.value}${endOrdinal.value > chapterEnd ? "+" : ""}`;
       }
     }
 
@@ -265,7 +269,9 @@ export default {
         }
         else {
           if (modalOpen.value && !hasParticularClicks) {
-            closeModals();
+            if(!props.doNotCloseModals) {
+              closeModals();
+            }
           } else {
             setInitialVerse(_verseInfo);
             const s = await select(event, allEventFunctions);
@@ -274,7 +280,9 @@ export default {
         }
       } else {
         $emit("back-clicked");
-        closeModals();
+        if(!props.doNotCloseModals) {
+          closeModals();
+        }
       }
       close();
     }
