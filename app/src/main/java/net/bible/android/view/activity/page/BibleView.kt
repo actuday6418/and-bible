@@ -185,7 +185,6 @@ class Selection(val bookInitials: String?, val startOrdinal: Int,
 class BibleView(val mainBibleActivity: MainBibleActivity,
                 internal var windowRef: WeakReference<Window>,
                 val windowControl: WindowControl,
-                private val bibleKeyHandler: BibleKeyHandler,
                 private val pageControl: PageControl,
                 private val pageTiltScrollControl: PageTiltScrollControl,
                 val linkControl: LinkControl,
@@ -1180,19 +1179,6 @@ class BibleView(val mainBibleActivity: MainBibleActivity,
         return handled
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        //TODO allow DPAD_LEFT to always change page and navigation between links using dpad
-        // placing BibleKeyHandler second means that DPAD left is unable to move to prev page if strongs refs are shown
-        // vice-versa (webview second) means right & left can not be used to navigate between Strongs links
-
-        // common key handling i.e. KEYCODE_DPAD_RIGHT & KEYCODE_DPAD_LEFT to change chapter
-        return if (bibleKeyHandler.onKeyUp(keyCode, event)) {
-            true
-        } else super.onKeyUp(keyCode, event)
-
-        // allow movement from link to link in current page
-    }
-
     fun scroll(forward: Boolean, scrollAmount: Int): Boolean {
         var ok = false
         hideScrollBar = true
@@ -1534,8 +1520,8 @@ class BibleView(val mainBibleActivity: MainBibleActivity,
         return true
     }
 
-    fun exportStudyPad() {
-        executeJavascriptOnUiThread("bibleView.emit('export_studypad')")
+    fun exportHtml() {
+        executeJavascriptOnUiThread("bibleView.emit('export_html')")
     }
 
     var onDestroy: (() -> Unit)? = null

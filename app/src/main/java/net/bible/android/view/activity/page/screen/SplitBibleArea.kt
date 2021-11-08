@@ -56,6 +56,8 @@ import net.bible.android.activity.databinding.SplitBibleAreaBinding
 import net.bible.android.control.event.ABEventBus
 import net.bible.android.control.event.passage.CurrentVerseChangedEvent
 import net.bible.android.control.event.window.CurrentWindowChangedEvent
+import net.bible.android.control.page.MultiFragmentDocument
+import net.bible.android.control.page.MyNotesDocument
 import net.bible.android.control.page.StudyPadDocument
 import net.bible.android.control.page.window.Window
 import net.bible.android.control.page.window.WindowControl
@@ -680,7 +682,7 @@ class SplitBibleArea: FrameLayout(mainBibleActivity) {
 
         val textOptionsSubMenu = menu.findItem(R.id.textOptionsSubMenu).subMenu
 
-        val export = menu.findItem(R.id.exportStudyPad)
+        val export = menu.findItem(R.id.exportHtml)
         export.title = app.getString(R.string.export_fileformat, "HTML")
 
         synchronized(BookName::class) {
@@ -783,7 +785,7 @@ class SplitBibleArea: FrameLayout(mainBibleActivity) {
         )
 
         val isMaximised = windowRepository.isMaximized
-
+        val firstDoc = window.bibleView?.firstDocument
         return when(itemId) {
 
             R.id.windowNew -> CommandPreference(
@@ -849,10 +851,14 @@ class SplitBibleArea: FrameLayout(mainBibleActivity) {
             R.id.copySettingsToWindow -> CommandPreference({_, _, _ ->
                 windowControl.copySettingsToWindow(window, order)
             })
-            R.id.exportStudyPad -> CommandPreference({_, _, _ ->
-                window.bibleView?.exportStudyPad()
+            R.id.exportHtml -> CommandPreference({ _, _, _ ->
+                window.bibleView?.exportHtml()
             },
-                visible = window.isVisible && window.bibleView?.firstDocument is StudyPadDocument
+                visible = window.isVisible && (
+                    firstDoc is StudyPadDocument ||
+                    firstDoc is MultiFragmentDocument  ||
+                    firstDoc is MyNotesDocument
+                )
             )
             else -> throw RuntimeException("Illegal menu item")
         }

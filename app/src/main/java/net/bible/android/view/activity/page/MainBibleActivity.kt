@@ -34,6 +34,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.ContextMenu
 import android.view.GestureDetector
+import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -146,7 +147,6 @@ class MainBibleActivity : CustomTitlebarActivityBase() {
 
     // handle requests from main menu
     @Inject lateinit var mainMenuCommandHandler: MenuCommandHandler
-    @Inject lateinit var bibleKeyHandler: BibleKeyHandler
     @Inject lateinit var searchControl: SearchControl
     @Inject lateinit var documentControl: DocumentControl
     @Inject lateinit var navigationControl: NavigationControl
@@ -612,7 +612,7 @@ class MainBibleActivity : CustomTitlebarActivityBase() {
                 startActivity(intent)
                 true
             }
-            searchButton.setOnClickListener { startActivityForResult(searchControl.getSearchIntent(documentControl.currentDocument), STD_REQUEST_CODE) }
+            searchButton.setOnClickListener { startActivityForResult(searchControl.getSearchIntent(documentControl.currentDocument, this@MainBibleActivity), STD_REQUEST_CODE) }
         }
     }
 
@@ -1232,10 +1232,10 @@ class MainBibleActivity : CustomTitlebarActivityBase() {
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
         Log.d(TAG, "Keycode:$keyCode")
         // common key handling i.e. KEYCODE_DPAD_RIGHT & KEYCODE_DPAD_LEFT
-        if (bibleKeyHandler.onKeyUp(keyCode, event)) {
-            return true
-        } else if (keyCode == KeyEvent.KEYCODE_SEARCH && windowControl.activeWindowPageManager.currentPage.isSearchable) {
-            val intent = searchControl.getSearchIntent(windowControl.activeWindowPageManager.currentPage.currentDocument)
+        //if (bibleKeyHandler.onKeyUp(keyCode, event)) {
+        //    return true
+        if (keyCode == KeyEvent.KEYCODE_SEARCH && windowControl.activeWindowPageManager.currentPage.isSearchable) {
+            val intent = searchControl.getSearchIntent(windowControl.activeWindowPageManager.currentPage.currentDocument, this)
             startActivityForResult(intent, STD_REQUEST_CODE)
             return true
         }
@@ -1368,6 +1368,10 @@ class MainBibleActivity : CustomTitlebarActivityBase() {
                     windowControl.activeWindow.bibleView?.volumeUpPressed()?: false
                 else -> super.onKeyDown(keyCode, event)
             }
+        }
+
+        if(keyCode == KeyEvent.KEYCODE_BACK && (event.source and InputDevice.SOURCE_KEYBOARD) != 0 && event.deviceId > 0) {
+            return true
         }
 
         return super.onKeyDown(keyCode, event)
