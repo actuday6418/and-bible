@@ -127,12 +127,6 @@ android {
         buildConfigField("String", "GitDescribe", "\"${getGitDescribe()}\"")
         buildConfigField("String", "BuildDate", "\"${SimpleDateFormat("dd/MM/YY HH:mm:ss").format(Date())}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled = true
-        applicationIdSuffix = "agr"
-    }
-
-    dexOptions {
-        preDexLibraries = false
     }
 
     buildTypes {
